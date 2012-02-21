@@ -1,0 +1,8 @@
+<?php
+/**
+ * IWikiSearch
+ */
+class IWikiSearch
+{
+
+}

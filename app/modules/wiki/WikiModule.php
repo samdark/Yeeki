@@ -12,9 +12,13 @@ class WikiModule extends CWebModule
 		),
 	);
 
-	public $authAdapter;
+	public $authAdapter = array(
+		'class' => 'YiiAuth',
+	);
 
-	public $searchAdapter;
+	public $searchAdapter = array(
+
+	);
 
 	/**
 	 * @var AbstractMarkup[]
@@ -53,15 +57,17 @@ class WikiModule extends CWebModule
 		return $this->_markupProcessors;
 	}
 
-	public function beforeControllerAction($controller, $action)
+	/**
+	 * @var IWikiAuth
+	 */
+	private $_auth;
+
+	public function getAuth()
 	{
-		if(parent::beforeControllerAction($controller, $action))
+		if($this->_auth===null)
 		{
-			// this method is called before any module controller action is performed
-			// you may place customized code here
-			return true;
+			$this->_auth = Yii::createComponent($this->authAdapter);
 		}
-		else
-			return false;
+		return $this->_auth;
 	}
 }

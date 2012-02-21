@@ -6,7 +6,6 @@ revision history
 ----------------
 
 - minor change flag (???)
-- conflict handling!!! (select again. if revision isn't the same as when started editing, try to merge somehow or show diff)
 
 syntax
 ------
@@ -28,7 +27,6 @@ extra
 - multiple users, user groups
 
 - search
-- db independent?
 - template projects for: HR, Sales, Corporate, Business Process manuals.
 - preview of the page while editing (for non-wysiwyg)
 - page comments?
