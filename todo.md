@@ -7,23 +7,14 @@ revision history
 
 - minor change flag (???)
 
-syntax
-------
-
-- different editors support
-
 security
 --------
 
-- page permissions
 - ACL
-- audit, who did what.
-- auth backends, Login with google apps
 
 extra
 -----
 
-- media manager (files, images, video, revisions, )
 - multiple users, user groups
 
 - search
@@ -31,11 +22,7 @@ extra
 - preview of the page while editing (for non-wysiwyg)
 - page comments?
 - page-redirect
-- custom output formats (pdf etc.)
-
 - design + ease of use
-
-- installer
 
 SAAS
 ----
