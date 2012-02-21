@@ -1,0 +1,38 @@
+#edit-page-form textarea {
+	width: 100%;
+	box-sizing: border-box;
+	-webkit-box-sizing:border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+
+	min-height: 400px;
+}
+
+.wiki-controls {
+	padding: 4px;
+	border: 1px solid #ccc;
+	margin-bottom: 10px;
+}
+
+.wiki-text {
+	min-height: 400px;
+}
+
+.wiki-text a.nonexisting {
+	color: #c00;
+}
+
+.wiki-diff {
+	font-family: monospace;
+	white-space: pre;
+}
+
+.wiki-diff del {
+	background: #ffe6cc;
+	text-decoration: none;
+}
+
+.wiki-diff ins {
+	background: #ccffcc;
+	text-decoration: none;
+}
