@@ -12,12 +12,19 @@ class WikiModule extends CWebModule
 		),
 	);
 
+	/**
+	 * @var array Auth adapter config
+	 */
 	public $authAdapter = array(
 		'class' => 'YiiAuth',
 	);
 
 	public $searchAdapter = array(
 
+	);
+
+	public $userAdapter = array(
+		'class' => 'WikiUser',
 	);
 
 	/**
@@ -62,8 +69,12 @@ class WikiModule extends CWebModule
 	 */
 	private $_auth;
 
+	/**
+	 * @return IWikiAuth
+	 */
 	public function getAuth()
 	{
+		Yii::import('wiki.components.auth.*');
 		if($this->_auth===null)
 		{
 			$this->_auth = Yii::createComponent($this->authAdapter);

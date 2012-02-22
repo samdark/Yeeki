@@ -1,7 +1,7 @@
 <?php
 /**
  * Default authentication backend that relies on CWebUser to get id, name, isGuest
- * and check access. Doesn't implement getting email.
+ * and check access. Doesn't implement getting email so
  */
 class YiiAuth implements IWikiAuth
 {
@@ -30,14 +30,6 @@ class YiiAuth implements IWikiAuth
 	}
 
 	/**
-	 * @return string user's email
-	 */
-	public function getUserEmail()
-	{
-		return null;
-	}
-
-	/**
 	 * @param string $operation the name of the operation that need access check.
 	 * @param array $params name-value pairs that would be passed to the operation
 	 * check routine.
@@ -47,4 +39,5 @@ class YiiAuth implements IWikiAuth
 	public function checkAccess($operation,$params)
 	{
 		return Yii::app()->user->checkAccess($operation,$params);
-	}}
+	}
+}

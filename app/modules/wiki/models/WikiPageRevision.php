@@ -10,6 +10,7 @@
  * @property string $comment
  * @property integer $is_minor
  * @property string $content
+ * @property string $user_id
  *
  * The followings are the available model relations:
  * @property WikiPage $page

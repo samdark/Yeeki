@@ -24,12 +24,6 @@ interface IWikiAuth
 
 	/**
 	 * @abstract
-	 * @return string user's email
-	 */
-	public function getUserEmail();
-
-	/**
-	 * @abstract
 	 * @param string $operation the name of the operation that need access check.
 	 * @param array $params name-value pairs that would be passed to the operation
 	 * check routine.

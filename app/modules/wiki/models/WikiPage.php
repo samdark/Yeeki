@@ -9,6 +9,7 @@
  * @property string $content
  * @property string $namespace
  * @property integer $revision_id
+ * @property string $user_id
  *
  * The followings are the available model relations:
  * @property WikiLink[] $links
