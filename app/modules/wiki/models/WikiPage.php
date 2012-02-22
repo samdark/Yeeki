@@ -10,6 +10,8 @@
  * @property string $namespace
  * @property integer $revision_id
  * @property string $user_id
+ * @property integer $created_at
+ * @property integer $updated_at
  *
  * The followings are the available model relations:
  * @property WikiLink[] $links
@@ -33,6 +35,18 @@ class WikiPage extends CActiveRecord
 	public function tableName()
 	{
 		return 'wiki_page';
+	}
+
+	public function behaviors()
+	{
+		return array(
+			'CTimestampBehavior'=>array(
+				'class'=>'zii.behaviors.CTimestampBehavior',
+				'createAttribute'=>'created_at',
+				'updateAttribute'=>'updated_at',
+				'setUpdateOnCreate'=>true,
+			)
+		);
 	}
 
 	/**

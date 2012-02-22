@@ -11,6 +11,7 @@
  * @property integer $is_minor
  * @property string $content
  * @property string $user_id
+ * @property integer $created_at
  *
  * The followings are the available model relations:
  * @property WikiPage $page
@@ -33,6 +34,17 @@ class WikiPageRevision extends CActiveRecord
 	public function tableName()
 	{
 		return 'wiki_page_revision';
+	}
+
+	public function behaviors()
+	{
+		return array(
+			'CTimestampBehavior'=>array(
+				'class'=>'zii.behaviors.CTimestampBehavior',
+				'createAttribute'=>'created_at',
+				'updateAttribute'=>false,
+			)
+		);
 	}
 
 	/**
