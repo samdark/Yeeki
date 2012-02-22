@@ -98,6 +98,12 @@ class DefaultController extends Controller
 			$comment = Yii::app()->request->getPost('comment', '');
 			$page->setAttributes(Yii::app()->request->getPost('WikiPage'));
 
+			$auth = $this->getModule()->getAuth();
+			if(!$auth->isGuest())
+			{
+				$page->user_id = $auth->getId();
+			}
+
 			if(empty($page->content))
 			{
 				// delete page if its content is empty?
@@ -150,6 +156,13 @@ class DefaultController extends Controller
 		$revision->comment = $comment;
 		$revision->content = $page->content;
 		$revision->page_id = $page->id;
+
+		$auth = $this->getModule()->getAuth();
+		if(!$auth->isGuest())
+		{
+			$revision->user_id = $auth->getId();
+		}
+
 		if($revision->save())
 		{
 			return $revision->id;
