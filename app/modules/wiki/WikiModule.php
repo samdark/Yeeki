@@ -1,9 +1,15 @@
 <?php
-
+/**
+ * Yeeki module.
+ *
+ * Includes all necessary wiki functionality. Can be used as a module in your
+ * application.
+ */
 class WikiModule extends CWebModule
 {
 	/**
-	 * @var array Markup transformations config used to process wiki page text
+	 * @var array Markup transformations config used to process wiki page text.
+	 * These are executed sequentionally
 	 */
 	public $markupProcessors = array(
 		array(
@@ -19,12 +25,18 @@ class WikiModule extends CWebModule
 		'class' => 'YiiAuth',
 	);
 
+	/**
+	 * @var array Search adapter config
+	 */
 	public $searchAdapter = array(
 
 	);
 
+	/**
+	 * @var array User adapter config
+	 */
 	public $userAdapter = array(
-		'class' => 'WikiUser',
+		//'class' => 'WikiUser',
 	);
 
 	/**
@@ -80,5 +92,19 @@ class WikiModule extends CWebModule
 			$this->_auth = Yii::createComponent($this->authAdapter);
 		}
 		return $this->_auth;
+	}
+
+	/**
+	 * @var IWikiUser
+	 */
+	private $_userAdapter;
+	public function getUserAdapter()
+	{
+		Yii::import('wiki.components.auth.*');
+		if($this->_userAdapter===null)
+		{
+			$this->_userAdapter = Yii::createApplication($this->userAdapter);
+		}
+		return $this->_userAdapter;
 	}
 }

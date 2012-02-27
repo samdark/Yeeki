@@ -2,7 +2,7 @@
 /**
  * IWikiSearch
  */
-class IWikiSearch
+interface IWikiSearch
 {
 
 }

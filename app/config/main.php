@@ -20,7 +20,11 @@ return array(
 	'defaultController' => 'wiki/default/index',
 
 	'modules'=>array(
-		'wiki',
+		'wiki' => array(
+			'userAdapter' => array(
+				'class' => 'WikiUser',
+			),
+		),
 		// remove on release
 		'gii'=>array(
 			'class'=>'system.gii.GiiModule',
