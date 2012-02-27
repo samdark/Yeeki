@@ -101,7 +101,7 @@ class DefaultController extends Controller
 			$auth = $this->getModule()->getAuth();
 			if(!$auth->isGuest())
 			{
-				$page->user_id = $auth->getId();
+				$page->user_id = $auth->getUserId();
 			}
 
 			if(empty($page->content))
@@ -160,7 +160,7 @@ class DefaultController extends Controller
 		$auth = $this->getModule()->getAuth();
 		if(!$auth->isGuest())
 		{
-			$revision->user_id = $auth->getId();
+			$revision->user_id = $auth->getUserId();
 		}
 
 		if($revision->save())
