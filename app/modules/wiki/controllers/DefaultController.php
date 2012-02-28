@@ -98,6 +98,7 @@ class DefaultController extends Controller
 			$comment = Yii::app()->request->getPost('comment', '');
 			$page->setAttributes(Yii::app()->request->getPost('WikiPage'));
 
+			/** @var $auth IWikiAuth */
 			$auth = $this->getModule()->getAuth();
 			if(!$auth->isGuest())
 			{
@@ -157,6 +158,7 @@ class DefaultController extends Controller
 		$revision->content = $page->content;
 		$revision->page_id = $page->id;
 
+		/** @var $auth IWikiAuth */
 		$auth = $this->getModule()->getAuth();
 		if(!$auth->isGuest())
 		{

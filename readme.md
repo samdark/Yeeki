@@ -62,18 +62,40 @@ return array(
 
 	// add the following:
 	'modules' => array(
-		'wiki',
+		'wiki' => array(
+
+		),
 	),
 
 	// …
 ~~~
 
-### Configuring module
+### Implementing data interfaces and configuring module
+
+In order to use wiki in your application you should implement some simple interfaces
+and configure module pointing to implementations. If you're using standard `Yii::app()->user`
+and standard RBAC then the only mandatory interface to implement is `IWikiUser`.
+You can find sample implementation in `app/components/WikiUser.php`. After
+implementing it you need to configure the module:
+
+~~~
+'modules' => array(
+	'wiki' => array(
+		'userAdapter' => array(
+			'class' => 'WikiUser',
+		),
+	),
+),
+~~~
+
+See also `IWikiAuth`, `IWikiSearch`.
+
 
 Theming Yeeki
 -------------
 
-
+You can use standard Yii theming feature to theme Yeeki. For details please
+refer to [the definitive guide](http://www.yiiframework.com/doc/guide/1.1/en/topics.theming).
 
 License
 -------
