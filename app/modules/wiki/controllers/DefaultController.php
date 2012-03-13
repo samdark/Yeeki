@@ -21,52 +21,60 @@ class DefaultController extends Controller
 		$page = WikiPage::model()->findByWikiUid($uid);
 		if($page)
 		{
-			if($rev)
+			if (strlen($page->content)==0)
 			{
-				$revision = WikiPageRevision::model()->findByAttributes(array(
-					'page_id' => $page->id,
-					'id' => $rev,
+				$this->render('no_page',array(
+				'uid' => $uid,
 				));
-
-				if(!$revision)
-				{
-					throw new CHttpException(404);
-				}
-
-				$cacheId = $revision->getCacheKey();
 			}
-			else
-			{
-				$cacheId = $page->getCacheKey();
-			}
-
-			if(!($text = Yii::app()->cache->get($cacheId)))
-			{
+			else{
 				if($rev)
 				{
-					$text = $revision->content;
+					$revision = WikiPageRevision::model()->findByAttributes(array(
+						'page_id' => $page->id,
+						'id' => $rev,
+					));	
+	
+					if(!$revision)
+					{
+						throw new CHttpException(404);
+					}
+
+					$cacheId = $revision->getCacheKey();
 				}
 				else
 				{
-					$text = $page->content;
+					$cacheId = $page->getCacheKey();
 				}
 
-				/** @var $markupProcessors AbstractMarkup[] */
-				$markupProcessors = $this->getModule()->getMarkupProcessors();
-				foreach($markupProcessors as $markupProcessor)
+				if(!($text = Yii::app()->cache->get($cacheId)))
 				{
-					$text = $markupProcessor->process($text);
+					if($rev)
+					{
+						$text = $revision->content;
+					}
+					else
+					{
+						$text = $page->content;
+					}
+	
+				/** @var $markupProcessors AbstractMarkup[] */
+					$markupProcessors = $this->getModule()->getMarkupProcessors();
+					foreach($markupProcessors as $markupProcessor)
+					{
+						$text = $markupProcessor->process($text);
+					}
+
+					$text = $this->replaceWikiLinks($text);
+	
+					Yii::app()->cache->set($cacheId, $text);
 				}
-
-				$text = $this->replaceWikiLinks($text);
-
-				Yii::app()->cache->set($cacheId, $text);
+	
+				$this->render('view', array(
+					'page' => $page,
+					'text' => $text,
+				));
 			}
-
-			$this->render('view', array(
-				'page' => $page,
-				'text' => $text,
-			));
 		}
 		else
 		{
@@ -74,7 +82,7 @@ class DefaultController extends Controller
 				'uid' => $uid,
 			));
 		}
-	}
+	}	
 
 	/**
 	 * Handles page edit
@@ -249,6 +257,8 @@ class DefaultController extends Controller
 		$pages = WikiPage::model()->findAll(array(
 			'order' => '',
 		));
+		foreach($pages as $page) $nspage[]=$page->namespace;
+		array_multisort($nspage, $pages);
 		$this->render('page_index', array(
 			'pages' => $pages,
 		));
