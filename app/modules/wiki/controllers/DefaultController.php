@@ -249,6 +249,8 @@ class DefaultController extends Controller
 		$pages = WikiPage::model()->findAll(array(
 			'order' => '',
 		));
+                foreach($pages as $page) $nspage[]=$page->namespace;
+                array_multisort($nspage,$pages);
 		$this->render('page_index', array(
 			'pages' => $pages,
 		));
