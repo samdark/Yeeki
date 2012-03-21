@@ -21,6 +21,14 @@ class DefaultController extends Controller
 		$page = WikiPage::model()->findByWikiUid($uid);
 		if($page)
 		{
+                    if(strlen($page->content)==0)
+                    {
+                        $this->render('no_page',array(
+                            'uid' => $uid,
+                        ));
+                    }
+                    else
+                    {
 			if($rev)
 			{
 				$revision = WikiPageRevision::model()->findByAttributes(array(
@@ -67,6 +75,7 @@ class DefaultController extends Controller
 				'page' => $page,
 				'text' => $text,
 			));
+                    }
 		}
 		else
 		{
