@@ -98,13 +98,8 @@ class DefaultController extends Controller
                     if($oldrev){
                         if($page->revision_id != $oldrev)
                         {
-                            $this->render('conflict',array(
-                                'page' => $page, 
-                                'oldrev' => $oldrev, 
-                                'addition'=> Yii::app()->request->getPost('content','')
-                            ));
-                            //here, place whatever conflict resolution is needed.
-                            //i.e. redirect to a "conflict" view
+                            $page->setAttributes(Yii::app()->request->getPost('WikiPage'));
+                            $this->redirect(array('conflict','uid'=>$uid,'oldrev'=>$oldrev,'added'=>$page->content));   
                         }
                     }
 			$comment = Yii::app()->request->getPost('comment', '');
@@ -273,10 +268,12 @@ class DefaultController extends Controller
 		'page_id' => $page->id,
 		'id' => $oldrev,
             ));
+            $diff1=TextDiff::compare($revision->content, $page->content);
+            $diff2=TextDiff::compare($revision->content, $added);
             $this->render('conflict', array(
-                'page'=>$page,
-                'revision'=>$revision,
-                'added'=>$added,
+                'rev'=>$revision,
+                'diff1'=>$diff1,
+                'diff2'=>$diff2,
             ));
         }
 	/**
