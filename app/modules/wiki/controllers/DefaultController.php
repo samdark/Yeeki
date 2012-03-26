@@ -98,9 +98,13 @@ class DefaultController extends Controller
                     if($oldrev){
                         if($page->revision_id != $oldrev)
                         {
-                            $this->redirect(array('history','uid' => $uid));
+                            $this->render('conflict',array(
+                                'page' => $page, 
+                                'oldrev' => $oldrev, 
+                                'addition'=> Yii::app()->request->getPost('content','')
+                            ));
                             //here, place whatever conflict resolution is needed.
-                            //instead of history, redirect to a "conflict" view
+                            //i.e. redirect to a "conflict" view
                         }
                     }
 			$comment = Yii::app()->request->getPost('comment', '');
@@ -262,6 +266,19 @@ class DefaultController extends Controller
 		));
 	}
 
+        public function actionConflict($uid,$oldrev,$added)
+        {
+            $page = WikiPage::model()->findByWikiUid($uid);
+            $revision = WikiPageRevision::model()->findByAttributes(array(
+		'page_id' => $page->id,
+		'id' => $oldrev,
+            ));
+            $this->render('conflict', array(
+                'page'=>$page,
+                'revision'=>$revision,
+                'added'=>$added,
+            ));
+        }
 	/**
 	 * Replaces wiki-links in a text provided
 	 *
