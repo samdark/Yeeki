@@ -81,7 +81,7 @@ class DefaultController extends Controller
 	 *
 	 * @param string $uid
 	 */
-	public function actionEdit($uid)
+	public function actionEdit($uid, $oldrev=null)
 	{
 		$page = WikiPage::model()->findByWikiUid($uid);
 		$comment = '';
@@ -95,6 +95,14 @@ class DefaultController extends Controller
 
 		if(Yii::app()->request->getPost('WikiPage'))
 		{
+                    if($oldrev){
+                        if($page->revision_id != $oldrev)
+                        {
+                            $this->redirect(array('history','uid' => $uid));
+                            //here, place whatever conflict resolution is needed.
+                            //instead of history, redirect to a "conflict" view
+                        }
+                    }
 			$comment = Yii::app()->request->getPost('comment', '');
 			$page->setAttributes(Yii::app()->request->getPost('WikiPage'));
 
