@@ -263,6 +263,11 @@ class DefaultController extends Controller
 
         public function actionConflict($uid,$oldrev,$added)
         {
+            //$oldrev and $revision refer to the state that the doc had been in when edit was opened.
+            //$added is what was retrieved from the request of the second edit. 
+            //however, it contains pure text, which is problematic in the url. to avoid this, we need a new column in the db.
+            //$uid contains the page, which holds the save from the first editor.
+            
             $page = WikiPage::model()->findByWikiUid($uid);
             $revision = WikiPageRevision::model()->findByAttributes(array(
 		'page_id' => $page->id,
@@ -271,6 +276,7 @@ class DefaultController extends Controller
             $diff1=TextDiff::compare($revision->content, $page->content);
             $diff2=TextDiff::compare($revision->content, $added);
             $this->render('conflict', array(
+                'page'=>$page,
                 'rev'=>$revision,
                 'diff1'=>$diff1,
                 'diff2'=>$diff2,
