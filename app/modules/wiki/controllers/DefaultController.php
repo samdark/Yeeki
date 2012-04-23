@@ -265,7 +265,7 @@ class DefaultController extends Controller
         {
             //$oldrev and $revision refer to the state that the doc had been in when edit was opened.
             //$added is what was retrieved from the request of the second edit. 
-            //however, it contains pure text, which is problematic in the url. to avoid this, we need a new column in the db.
+            //however, it contains pure text, which is problematic in the url. to avoid this, we will need a new column in the db.
             //$uid contains the page, which holds the save from the first editor.
             
             $page = WikiPage::model()->findByWikiUid($uid);
@@ -275,12 +275,73 @@ class DefaultController extends Controller
             ));
             $diff1=TextDiff::compare($revision->content, $page->content);
             $diff2=TextDiff::compare($revision->content, $added);
-            $this->render('conflict', array(
-                'page'=>$page,
-                'rev'=>$revision,
-                'diff1'=>$diff1,
-                'diff2'=>$diff2,
-            ));
+            if(Yii::app()->request->getPost('WikiPage'))
+            {
+                $page->setAttributes(Yii::app()->request->getPost('WikiPage'));
+                
+                switch($page->radrev):
+                    case '1':
+                        //restore to previous revision
+                        break;
+                    
+                    case '2':
+                        $this->render('view', array('uid'=>$uid));
+                        break;
+                    
+                    case '3':
+                        //add new revision with comment="Conflicted Revision"
+                        //use code from actionEdit with variable $added
+                        $comment = 'Conflicted Revision';
+			$page->content = $added;
+			/** @var $auth IWikiAuth */
+			$auth = $this->getModule()->getAuth();
+			if(!$auth->isGuest())
+			{
+				$page->user_id = $auth->getUserId();
+			}
+
+			if(empty($page->content))
+			{
+				// delete page if its content is empty?
+				// how to deal with revisions?
+				// do we need an ability to restore page?
+			}
+
+			$trans = $page->dbConnection->beginTransaction();
+			$justCreated = false;
+			if($page->isNewRecord)
+			{
+				$justCreated = true;
+				$page->save();
+			}
+
+			$revId = $this->addPageRevision($page, $comment);
+			if($revId)
+			{
+				$page->revision_id = $revId;
+				if($page->save())
+				{
+					if($this->updateWikiLinks($page, $justCreated))
+					{
+						$trans->commit();
+						Yii::app()->cache->delete($page->getCacheKey());
+						$this->deleteLinksourceCache($page);
+						$this->redirect(array('view', 'uid' => $uid));
+					}
+				}
+			}                     
+                        break;
+                endswitch;
+            }
+            else
+            {
+                $this->render('conflict', array(
+                    'page'=>$page,
+                    'rev'=>$revision,
+                    'diff1'=>$diff1,
+                    'diff2'=>$diff2,
+                ));
+            }
         }
 	/**
 	 * Replaces wiki-links in a text provided

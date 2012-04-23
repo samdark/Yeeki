@@ -1,7 +1,18 @@
 <h1><?php echo CHtml::encode($page->getWikiUid())?></h1>
 <?php echo 'There is a conflict. Please pick one of the following...' ?>
-<?php echo CHtml::link(Yii::t('wiki','OLD: '),array('view', 'uid'=>$page->page_uid, 'rev'=>$rev->id)) .$rev->content.'<br />' ?>
+<br/>
+
+<?php $form=$this->beginWidget('CActiveForm', array(
+	'id'=>'buttons',
+	'enableClientValidation'=>true,
+	'clientOptions'=>array(
+	'validateOnSubmit'=>true,
+	),
+)); ?>
 <div class="wiki-diff">
-<?php echo CHtml::link(Yii::t('wiki','Current Revision: '),array('view', 'uid'=>$page->page_uid)).$diff1.'<br />' ?>
-<?php echo 'Your Revision'.$diff2 ?>
+<?php echo CHtml::activeRadioButtonList($page,'radrev',array('1' => 'OLD:  '.$rev->content, '2' => 'CURRENT:   '.$diff1, '3' => 'YOURS:   '.$diff2));?><br />
 </div>
+<?php echo CHtml::submitButton('Submit'); ?>
+<?php $this->endWidget(); ?>
+        
+
