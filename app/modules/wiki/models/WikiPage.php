@@ -49,6 +49,10 @@ class WikiPage extends CActiveRecord
 		);
 	}
 
+        public $permissions;
+        public $main_permissions;
+        public $sub_permissions;
+        public $input;
 	/**
 	 * @return array validation rules for model attributes.
 	 */

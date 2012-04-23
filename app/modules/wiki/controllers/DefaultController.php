@@ -19,12 +19,7 @@ class DefaultController extends Controller
 	public function actionView($uid, $rev = null)
 	{
 		$page = WikiPage::model()->findByWikiUid($uid);
-                if(!checkPermissions($page->permissions))
-                {
-                    $this->render('not_allowed',array(
-                        'page'=>$page,
-                    ));
-                }
+                //if(!checkPermissions($page->permissions)) $this->render('not_allowed'));
                 if($page)
 		{
 			if($rev)
@@ -91,27 +86,46 @@ class DefaultController extends Controller
         public function actionPermissions($uid)
         {
             $page = WikiPage::model()->findByWikiUid($uid);
+            //the permissions view form stores either "public", "solo", or a list of people. 
+            //the three possiblities are dealt with separately below
+            
+            if(Yii::app()->request->getPost('WikiPage'))
+            {
+                $page->setAttributes(Yii::app()->request->getPost('MarkModel'));
+                switch($page->main_permissions):
+                    case 1:
+                        $page->permissions= 'Public';
+                        $this->render('view',array($uid));
+                        break;
+                    case 2:
+                        switch($page->sub_permissions):
+                            case 1:
+                                $page->permissions='None';
+                                $this->render('view',array($uid));
+                                break;
+                            case 2:
+                                for($i=1; $page->input[$i] != null; $i++) 
+                                    $page->permissions .= $page->input[$i]; 
+                                $this->render('view',array($uid));
+                                break;
+                        endswitch;
+                        break;
+                endswitch;
+            }
             $this->render('permissions', array(
                 'page' => $page,
             ));
-            //the permissions view form sends back either "public", "solo", or a list of people. 
-            //the three possiblities are dealt with separately below
-            if(Yii::app()->request->getPost('WikiPage'))
-            {
-                if($public) $page->permissions='public';
-                elseif($solo) $page->permissions=$page->user_id;
-                elseif($input)
-                {
-                    for($i=1,input->$i =! null, i++) $page->permissions .= input->$i;                        
-                }
-            }
         }
         public function checkPermissions($permissions)
         {
-            //determine current user.
-            //look for his name in list of permissions
-            //exception:
-            //      if permissions=public, return true
+            if ($permissions=='Public' || $permissions=='')
+            {
+                return true;
+            }
+            else
+            {
+                //determine current user. search for his name in list of permissions.
+            }
             
         }
 	public function actionEdit($uid)
