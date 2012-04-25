@@ -18,8 +18,11 @@ class DefaultController extends Controller
 	 */
 	public function actionView($uid, $rev = null)
 	{
-		$page = WikiPage::model()->findByWikiUid($uid);
-                //if(!checkPermissions($page->permissions)) $this->render('not_allowed'));
+            $page = WikiPage::model()->findByWikiUid($uid);
+            if(!$this->checkPermissions($page->permissions))
+                $this->render('not_allowed');
+            else
+            {
                 if($page)
 		{
 			if($rev)
@@ -75,6 +78,7 @@ class DefaultController extends Controller
 				'uid' => $uid,
 			));
 		}
+            }
 	}
 
 	/**
@@ -86,45 +90,57 @@ class DefaultController extends Controller
         public function actionPermissions($uid)
         {
             $page = WikiPage::model()->findByWikiUid($uid);
-            //the permissions view form stores either "public", "solo", or a list of people. 
+            //the permissions view form stores either "" for public, or a list of people, either just the author, or a custom list. 
             //the three possiblities are dealt with separately below
             
             if(Yii::app()->request->getPost('WikiPage'))
             {
-                $page->setAttributes(Yii::app()->request->getPost('MarkModel'));
-                switch($page->main_permissions):
+                //$page->setAttributes(Yii::app()->request->getPost('WikiPage'));
+                switch($_POST['WikiPage']['main_permissions']):
                     case 1:
-                        $page->permissions= 'Public';
-                        $this->render('view',array($uid));
+                        $page->permissions= '';
+                        $this->redirect(array('view', 'uid' => $uid));
                         break;
                     case 2:
-                        switch($page->sub_permissions):
+                        switch($_POST['WikiPage']['sub_permissions']):
                             case 1:
-                                $page->permissions='None';
-                                $this->render('view',array($uid));
+                                $auth = $this->getModule()->getAuth();
+                                if(!$auth->isGuest())
+                                    $page->permissions=$auth;
+                                //else: sorry you do not have the ability to choose this option
+                                else $page->permissions='';
+                                $this->redirect(array('view', 'uid' => $uid));
                                 break;
                             case 2:
-                                for($i=1; $page->input[$i] != null; $i++) 
-                                    $page->permissions .= $page->input[$i]; 
-                                $this->render('view',array($uid));
+                                $page->permissions = $_POST['WikiPage']['input']; 
+                                $this->redirect(array('view', 'uid' => $uid));
                                 break;
                         endswitch;
                         break;
                 endswitch;
             }
-            $this->render('permissions', array(
-                'page' => $page,
-            ));
-        }
-        public function checkPermissions($permissions)
-        {
-            if ($permissions=='Public' || $permissions=='')
+            else
             {
-                return true;
+                $this->render('permissions', array(
+                    'page' => $page,
+                ));
+            }
+        }       
+        private function checkPermissions($permissions)
+        {
+            if ($permissions=='')
+            {
+                return false;
             }
             else
             {
-                //determine current user. search for his name in list of permissions.
+                $auth = $this->getModule()->getAuth();
+                $users=explode(';',$permissions);
+                for ($i=0; $i<length($users); $i++)
+                {
+                    if($users[i]==$auth) return true;
+                }
+                return false;
             }
             
         }
