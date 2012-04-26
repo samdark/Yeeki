@@ -10,7 +10,7 @@
 	),
 )); ?>
 <div class="wiki-diff">
-<?php echo CHtml::activeRadioButtonList($page,'radrev',array('1' => 'OLD:  '.$rev->content, '2' => 'CURRENT:   '.$diff1, '3' => 'YOURS:   '.$diff2));?><br />
+<?php echo CHtml::activeRadioButtonList($page,'radrev',array(1 => 'OLD:  '.$rev->content, 2 => 'CURRENT:   '.$diff1, 3 => 'YOURS:   '.$diff2));?><br />
 </div>
 <?php echo CHtml::submitButton('Submit'); ?>
 <?php $this->endWidget(); ?>

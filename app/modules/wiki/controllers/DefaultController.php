@@ -277,20 +277,49 @@ class DefaultController extends Controller
             $diff2=TextDiff::compare($revision->content, $added);
             if(Yii::app()->request->getPost('WikiPage'))
             {
-                $page->setAttributes(Yii::app()->request->getPost('WikiPage'));
-                
-                switch($page->radrev):
-                    case '1':
+                //$page->setAttributes(Yii::app()->request->getPost('WikiPage'));
+                switch($_POST['WikiPage']['radrev']):
+                    case 1:
                         //restore to previous revision
+                        //by adding a new revision with comment="Reverted Revision". used code from actionEdit with variable $revision->content as the content
+                        //is there a quicker way to revert the last revision, without a new "revert" revision.
+                        //i noticed that there is no support for revert in actionDiff.
+                        
+                        $comment = 'Reverted Revision';
+			$page->content = $revision->content;
+			/** @var $auth IWikiAuth */
+			$auth = $this->getModule()->getAuth();
+			if(!$auth->isGuest())
+			{
+				$page->user_id = $auth->getUserId();
+			}
+
+			$trans = $page->dbConnection->beginTransaction();
+
+			$revId = $this->addPageRevision($page, $comment);
+			if($revId)
+			{
+				$page->revision_id = $revId;
+				if($page->save())
+				{
+					if($this->updateWikiLinks($page))
+					{
+						$trans->commit();
+						Yii::app()->cache->delete($page->getCacheKey());
+						$this->deleteLinksourceCache($page);
+						$this->redirect(array('view', 'uid' => $uid));
+					}
+				}
+			}                     
                         break;
                     
-                    case '2':
-                        $this->render('view', array('uid'=>$uid));
+                    case 2:
+                        $this->redirect(array('view', 'uid'=>$uid));
                         break;
                     
-                    case '3':
+                    case 3:
                         //add new revision with comment="Conflicted Revision"
-                        //use code from actionEdit with variable $added
+                        //used code from actionEdit with variable $added as the content
                         $comment = 'Conflicted Revision';
 			$page->content = $added;
 			/** @var $auth IWikiAuth */
