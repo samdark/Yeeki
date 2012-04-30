@@ -16,3 +16,6 @@ Thumbs.db
 framework
 app/runtime
 www/assets
+
+#exclude main.php for commit reasons
+app/config/main.php
