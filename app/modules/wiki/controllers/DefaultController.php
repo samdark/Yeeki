@@ -250,7 +250,7 @@ class DefaultController extends Controller
 	public function actionPageIndex()
 	{
 		$pages = WikiPage::model()->findAll(array(
-			'order' => '',
+			'order' => 'namespace, page_uid',
 		));
 		$this->render('page_index', array(
 			'pages' => $pages,
