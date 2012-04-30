@@ -18,8 +18,12 @@ class DefaultController extends Controller
 	 */
 	public function actionView($uid, $rev = null)
 	{
-		$page = WikiPage::model()->findByWikiUid($uid);
-		if($page)
+            $page = WikiPage::model()->findByWikiUid($uid);
+            if(!$this->checkPermissions($page->permissions))
+                $this->render('not_allowed');
+            else
+            {
+                if($page)
 		{
 			if($rev)
 			{
@@ -84,6 +88,7 @@ class DefaultController extends Controller
 				'uid' => $uid,
 			));
 		}
+            }
 	}
 
 	/**
@@ -91,6 +96,64 @@ class DefaultController extends Controller
 	 *
 	 * @param string $uid
 	 */
+        
+        public function actionPermissions($uid)
+        {
+            $page = WikiPage::model()->findByWikiUid($uid);
+            //the permissions view form stores either "" for public, or a list of people, either just the author, or a custom list. 
+            //the three possiblities are dealt with separately below
+            
+            if(Yii::app()->request->getPost('WikiPage'))
+            {
+                //$page->setAttributes(Yii::app()->request->getPost('WikiPage'));
+                switch($_POST['WikiPage']['main_permissions']):
+                    case 1:
+                        $page->permissions= '';
+                        $this->redirect(array('view', 'uid' => $uid));
+                        break;
+                    case 2:
+                        switch($_POST['WikiPage']['sub_permissions']):
+                            case 1:
+                                $auth = $this->getModule()->getAuth();
+                                if(!$auth->isGuest())
+                                    $page->permissions=$auth;
+                                //else: sorry you do not have the ability to choose this option
+                                else $page->permissions='';
+                                $this->redirect(array('view', 'uid' => $uid));
+                                break;
+                            case 2:
+                                $page->permissions = $_POST['WikiPage']['input']; 
+                                $this->redirect(array('view', 'uid' => $uid));
+                                break;
+                        endswitch;
+                        break;
+                endswitch;
+            }
+            else
+            {
+                $this->render('permissions', array(
+                    'page' => $page,
+                ));
+            }
+        }       
+        private function checkPermissions($permissions)
+        {
+            if ($permissions=='')
+            {
+                return false;
+            }
+            else
+            {
+                $auth = $this->getModule()->getAuth();
+                $users=explode(';',$permissions);
+                for ($i=0; $i<length($users); $i++)
+                {
+                    if($users[i]==$auth) return true;
+                }
+                return false;
+            }
+            
+        }
 	public function actionEdit($uid)
 	{
 		$page = WikiPage::model()->findByWikiUid($uid);
