@@ -115,13 +115,6 @@ class DefaultController extends Controller
 				$page->user_id = $auth->getUserId();
 			}
 
-			if(empty($page->content))
-			{
-				// delete page if its content is empty?
-				// how to deal with revisions?
-				// do we need an ability to restore page?
-			}
-
 			$trans = $page->dbConnection->beginTransaction();
 
 			$justCreated = false;
