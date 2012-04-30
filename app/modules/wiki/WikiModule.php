@@ -52,11 +52,19 @@ class WikiModule extends CWebModule
 			'wiki.components.*',
 		));
 
-		Yii::app()->clientScript->registerCssFile(
-		    Yii::app()->assetManager->publish(
-		        Yii::getPathOfAlias('wiki.assets').'/wiki.css'
-		    )
-		);
+		/** @var $cs CClientScript */
+		$cs = Yii::app()->clientScript;
+
+		if(!isset($cs->packages['yeeki']))
+		{
+			$cs->addPackage('yeeki',array(
+				'basePath' => 'wiki.assets',
+				'depends' => array('jquery'),
+				'css' => array('wiki.css'),
+				'js' => array('jquery.markitup.js', 'wiki.js'),
+			));
+		}
+		$cs->registerPackage('yeeki');
 	}
 
 	/**
