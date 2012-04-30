@@ -47,11 +47,17 @@ return array(
 				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 			),
 		),
-		'db'=>require 'db.php',
+		'db'=>array(
+                    	'connectionString' => 'mysql:host=localhost;dbname=yii_wiki',
+                        'emulatePrepare' => true,
+                        'username' => 'root',
+                        'password' => '',
+                        'charset' => 'utf8',
+                ),
 		'errorHandler'=>array(
 			// use 'site/error' action to display errors
-            'errorAction'=>'site/error',
-        ),
+                        'errorAction'=>'site/error',
+                ),
 		'log'=>array(
 			'class'=>'CLogRouter',
 			'routes'=>array(
