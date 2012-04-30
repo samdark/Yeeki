@@ -63,10 +63,20 @@ class DefaultController extends Controller
 				Yii::app()->cache->set($cacheId, $text);
 			}
 
-			$this->render('view', array(
-				'page' => $page,
-				'text' => $text,
-			));
+			$text = trim($text);
+			if(empty($text))
+			{
+				$this->render('no_page',array(
+					'uid' => $uid,
+				));
+			}
+			else
+			{
+				$this->render('view', array(
+					'page' => $page,
+					'text' => $text,
+				));
+			}
 		}
 		else
 		{

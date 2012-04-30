@@ -37,7 +37,7 @@ Currently you need to perform steps listed below. In the future versions all the
 will be covered by automated installer.
 
 1. Unpack contents of release archive.
-2. Point your webserver root to `www`.
+2. Point your webserver docroot to `www`.
 3. Make sure webserver have write permissions for `www/assets` and `app/runtime`.
 3. Create a database with `utf8` encoding and `utf8_general_ci` collation.
 4. Provide proper database credentials in `app/config/db.php`.
@@ -110,6 +110,7 @@ Credits
 -------
 
 - Initial code and ideas: Alexander Makarov, @samdark.
+- Features contribution: Mark Bryk, @mbryk.
 
 Thanks
 ------
