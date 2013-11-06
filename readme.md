@@ -46,14 +46,14 @@ will be covered by automated installer.
 Using Yeeki as a module
 ----------------------
 
-1. Copy `app/modules/wiki` to your application directory.
-2. Using `yiic` apply migrations with the following command:
+- Copy `app/modules/wiki` to your application directory.
+- Using `yiic` apply migrations with the following command:
 
 ~~~
 yiic migrate --migrationPath=application.modules.wiki.migrations --migrationTable=wiki_migration
 ~~~
 
-3. Add `wiki` module to your web application config (usually it is `protected/config/main.php`):
+- Add `wiki` module to your web application config (usually it is `protected/config/main.php`):
 
 ```php
 return array(
@@ -70,7 +70,7 @@ return array(
 	// …
 ```
 
-4. Add `cache` component to your application configuration:
+- Add `cache` component to your application configuration:
 
 ```php
 return array(
