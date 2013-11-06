@@ -55,7 +55,7 @@ yiic migrate --migrationPath=application.modules.wiki.migrations --migrationTabl
 
 3. Add `wiki` module to your web application config (usually it is `protected/config/main.php`):
 
-~~~
+```php
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
 	'name'=>'My cool application',
@@ -68,7 +68,20 @@ return array(
 	),
 
 	// …
-~~~
+```
+
+4. Add `cache` component to your application configuration:
+
+```php
+return array(
+  // ...
+  'components' => array(
+    'cache' => array(
+       'class' => 'CFileCache',
+    ),
+  ),
+);
+```
 
 ### Implementing data interfaces and configuring module
 
