@@ -91,7 +91,7 @@ class DefaultController extends Controller
 	 *
 	 * @param string $uid
 	 */
-	public function actionEdit($uid)
+	public function actionEdit($uid, $oldrev=null)
 	{
 		$page = WikiPage::model()->findByWikiUid($uid);
 		$comment = '';
@@ -105,6 +105,13 @@ class DefaultController extends Controller
 
 		if(Yii::app()->request->getPost('WikiPage'))
 		{
+                    if($oldrev){
+                        if($page->revision_id != $oldrev)
+                        {
+                            $page->setAttributes(Yii::app()->request->getPost('WikiPage'));
+                            $this->redirect(array('conflict','uid'=>$uid,'oldrev'=>$oldrev,'added'=>$page->content));   
+                        }
+                    }
 			$comment = Yii::app()->request->getPost('comment', '');
 			$page->setAttributes(Yii::app()->request->getPost('WikiPage'));
 
@@ -257,6 +264,117 @@ class DefaultController extends Controller
 		));
 	}
 
+        public function actionConflict($uid,$oldrev,$added)
+        {
+            //$oldrev and $revision refer to the state that the doc had been in when edit was opened.
+            //$added is what was retrieved from the request of the second edit. 
+            //however, it contains pure text, which is problematic in the url. to avoid this, we will need a new column in the db.
+            //$uid contains the page, which holds the save from the first editor.
+            
+            $page = WikiPage::model()->findByWikiUid($uid);
+            $revision = WikiPageRevision::model()->findByAttributes(array(
+		'page_id' => $page->id,
+		'id' => $oldrev,
+            ));
+            $diff1=TextDiff::compare($revision->content, $page->content);
+            $diff2=TextDiff::compare($revision->content, $added);
+            if(Yii::app()->request->getPost('WikiPage'))
+            {
+                //$page->setAttributes(Yii::app()->request->getPost('WikiPage'));
+                switch($_POST['WikiPage']['radrev']):
+                    case 1:
+                        //restore to previous revision
+                        //by adding a new revision with comment="Reverted Revision". used code from actionEdit with variable $revision->content as the content
+                        //is there a quicker way to revert the last revision, without a new "revert" revision.
+                        //i noticed that there is no support for revert in actionDiff.
+                        
+                        $comment = 'Reverted Revision';
+			$page->content = $revision->content;
+			/** @var $auth IWikiAuth */
+			$auth = $this->getModule()->getAuth();
+			if(!$auth->isGuest())
+			{
+				$page->user_id = $auth->getUserId();
+			}
+
+			$trans = $page->dbConnection->beginTransaction();
+
+			$revId = $this->addPageRevision($page, $comment);
+			if($revId)
+			{
+				$page->revision_id = $revId;
+				if($page->save())
+				{
+					if($this->updateWikiLinks($page))
+					{
+						$trans->commit();
+						Yii::app()->cache->delete($page->getCacheKey());
+						$this->deleteLinksourceCache($page);
+						$this->redirect(array('view', 'uid' => $uid));
+					}
+				}
+			}                     
+                        break;
+                    
+                    case 2:
+                        $this->redirect(array('view', 'uid'=>$uid));
+                        break;
+                    
+                    case 3:
+                        //add new revision with comment="Conflicted Revision"
+                        //used code from actionEdit with variable $added as the content
+                        $comment = 'Conflicted Revision';
+			$page->content = $added;
+			/** @var $auth IWikiAuth */
+			$auth = $this->getModule()->getAuth();
+			if(!$auth->isGuest())
+			{
+				$page->user_id = $auth->getUserId();
+			}
+
+			if(empty($page->content))
+			{
+				// delete page if its content is empty?
+				// how to deal with revisions?
+				// do we need an ability to restore page?
+			}
+
+			$trans = $page->dbConnection->beginTransaction();
+			$justCreated = false;
+			if($page->isNewRecord)
+			{
+				$justCreated = true;
+				$page->save();
+			}
+
+			$revId = $this->addPageRevision($page, $comment);
+			if($revId)
+			{
+				$page->revision_id = $revId;
+				if($page->save())
+				{
+					if($this->updateWikiLinks($page, $justCreated))
+					{
+						$trans->commit();
+						Yii::app()->cache->delete($page->getCacheKey());
+						$this->deleteLinksourceCache($page);
+						$this->redirect(array('view', 'uid' => $uid));
+					}
+				}
+			}                     
+                        break;
+                endswitch;
+            }
+            else
+            {
+                $this->render('conflict', array(
+                    'page'=>$page,
+                    'rev'=>$revision,
+                    'diff1'=>$diff1,
+                    'diff2'=>$diff2,
+                ));
+            }
+        }
 	/**
 	 * Replaces wiki-links in a text provided
 	 *

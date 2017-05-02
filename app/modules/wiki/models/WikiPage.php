@@ -48,7 +48,10 @@ class WikiPage extends CActiveRecord
 			)
 		);
 	}
-
+        
+        //Can I do this? Just add a variable to the WikiPage model, without it being a column in the WikiPage database?
+        public $radrev;
+        
 	/**
 	 * @return array validation rules for model attributes.
 	 */
